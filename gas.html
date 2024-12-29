@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ideal Gas Law Simulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        	width:100%;
+            margin:0;
+            padding:0;
+        }
+        
+        table{
+        width:85%;
+        }
+      	
+       
+        td{
+        padding:10px;
+        width:50%;
+        
+        }
+      
+        .inputs {
+            margin-bottom: 20px;
+            
+        }
+        
+        .box {
+            border: 2px solid black;
+            position: relative;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        .gas-particle {
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        footer{
+            position: fixed;
+            bottom: 0;
+            padding: 10px;
+            text-align: center;
+            width: 100%;
+            border-top: 1px solid;
+            font-size: 13px;
+        }
+        
+       
+    </style>
+</head>
+<body>
+<center>
+    <div class="container">
+        <h1>İdeal Gaz Simülasyonu</h1>
+        <br/>
+        <div class="inputs">
+        	<table border="1">
+            
+           
+            <tr>
+                <td>Sıcaklık (Kelvin)</td>
+                <td>
+                <input type="range" id="temperature" value="300" min="1" max="1000" step="10" oninput="updateSimulation()">
+                <span id="temperature-value">300</span> K
+                </td>
+            </tr>
+            <tr>
+                <td>Hacim (Litre)</td>
+                <td>
+                <input type="range" id="volume" value="10" min="1" max="50" step="1" oninput="updateVolume()" onmouseup="resetParticles()">
+                <span id="volume-value">10</span> L
+                </td>
+            </tr>
+            <tr>
+                <td>Gaz Miktarı (Mol)</td>
+                <td>
+                <input type="range" id="moles" value="1" min="0.1" max="10" step="0.1" oninput="updateMoles()" onmouseup="resetParticles()">
+                <span id="moles-value">1</span> mol
+                </td>
+            </tr>
+            
+            
+            
+            
+            </table>
+        </div>
+        <p id="pressure-output"></p>
+        <div id="box-container" style="width: 300px; height: 300px;">
+            <div class="box" id="gas-container"></div>
+        </div>
+        
+   
+   </div>
+
+   <footer>
+    Developed By FURKAN GÖLOĞLU
+   </footer>
+    
+    </center>
+
+    <script>
+        const R = 0.0821; // Ideal gas constant (L·atm/(mol·K))
+
+        let particles = [];
+        let boxSize = 300;
+        let cont = true
+
+        function updateSimulation() {
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const volume = parseFloat(document.getElementById('volume').value);
+            const moles = parseFloat(document.getElementById('moles').value);
+
+            document.getElementById('temperature-value').textContent = temperature;
+            document.getElementById('volume-value').textContent = volume;
+            document.getElementById('moles-value').textContent = Number(moles).toFixed(1);
+
+            const pressure = (moles * R * temperature) / volume; // P = nRT / V
+            document.getElementById('pressure-output').textContent = `Basınç (P): ${pressure.toFixed(2)} atm`;
+
+            // Adjust particle speed based on temperature
+            const speedFactor = Math.sqrt(temperature / 300);
+            particles.forEach(p => {
+                p.vx *= speedFactor / p.speedFactor;
+                p.vy *= speedFactor / p.speedFactor;
+                p.speedFactor = speedFactor;
+            });
+        }
+
+        function updateVolume() {
+        	cont = false
+            const volume = parseFloat(document.getElementById('volume').value);
+
+            // Adjust the size of the box based on the volume
+            boxSize = Math.sqrt(volume) * 30; // Scale volume visually
+            const boxContainer = document.getElementById('box-container');
+            const container = document.getElementById('gas-container');
+            boxContainer.style.width = `${boxSize}px`;
+            boxContainer.style.height = `${boxSize}px`;
+            container.style.width = `${boxSize}px`;
+            container.style.height = `${boxSize}px`;
+
+            updateSimulation(); // Update simulation after volume change
+        }
+
+        function updateMoles() {
+            const moles = parseFloat(document.getElementById('moles').value);
+            document.getElementById('moles-value').textContent = Number(moles).toFixed(1);
+            updateSimulation();
+        }
+
+        function resetParticles() {
+        	cont = true
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const moles = parseFloat(document.getElementById('moles').value);
+
+            if (temperature <= 0 || moles <= 0) {
+                alert('Temperature and moles must be greater than zero!');
+                return;
+            }
+
+            const numParticles = Math.min(100, Math.floor(moles * 10)); // Scale particle count
+            const speedFactor = Math.sqrt(temperature / 300); // Adjust speed based on temperature
+
+            initializeParticles(numParticles, speedFactor);
+        }
+
+        function initializeParticles(numParticles, speedFactor) {
+            const container = document.getElementById('gas-container');
+            container.innerHTML = ''; // Clear previous particles
+            particles = [];
+
+            for (let i = 0; i < numParticles; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'gas-particle';
+                particle.style.left = Math.random() * (boxSize - 10) + 'px';
+                particle.style.top = Math.random() * (boxSize - 10) + 'px';
+                container.appendChild(particle);
+
+                const x = parseFloat(particle.style.left);
+                const y = parseFloat(particle.style.top);
+                const vx = (Math.random() - 0.5) * 2 * speedFactor;
+                const vy = (Math.random() - 0.5) * 2 * speedFactor;
+
+                particles.push({ element: particle, x, y, vx, vy, speedFactor });
+            }
+        }
+
+        function animateParticles() {
+        	if(cont){
+        	
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                // Check for collisions with the walls
+                if (p.x <= 0 || p.x >= boxSize - 10) p.vx = -p.vx;
+                if (p.y <= 0 || p.y >= boxSize - 10) p.vy = -p.vy;
+
+                p.element.style.left = p.x + 'px';
+                p.element.style.top = p.y + 'px';
+            });
+            requestAnimationFrame(animateParticles);
+            } else {requestAnimationFrame(animateParticles)}
+        }
+
+        function simulateGas() {
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const volume = parseFloat(document.getElementById('volume').value);
+            const moles = parseFloat(document.getElementById('moles').value);
+
+            if (temperature <= 0 || volume <= 0 || moles <= 0) {
+                alert('All values must be greater than zero!');
+                return;
+            }
+
+            const numParticles = Math.min(100, Math.floor(moles * 10)); // Scale particle count
+            const speedFactor = Math.sqrt(temperature / 300); // Adjust speed based on temperature
+
+            initializeParticles(numParticles, speedFactor);
+            animateParticles();
+        }
+       
+
+        simulateGas(); // Initial simulation
+        updateSimulation()
+        updateVolume()
+        updateMoles()
+        resetParticles()
+        
+      
+    </script>
+</body>
+</html>
