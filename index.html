@@ -107,7 +107,7 @@
     </center>
 
     <script>
-        const R = 0.0821; // Ideal gas constant (L·atm/(mol·K))
+        const R = 0.0821; 
 
         let particles = [];
         let boxSize = 300;
@@ -123,9 +123,9 @@
             document.getElementById('moles-value').textContent = Number(moles).toFixed(1);
 
             const pressure = (moles * R * temperature) / volume; // P = nRT / V
-            document.getElementById('pressure-output').textContent = `Basınç (P): ${pressure.toFixed(2)} atm`;
+            document.getElementById('pressure-output').textContent = `Basınç (P): ${pressure.toFixed(2)} atm - PV = ${Number(presuure) * Number(volume)}`;
 
-            // Adjust particle speed based on temperature
+           
             const speedFactor = Math.sqrt(temperature / 300);
             particles.forEach(p => {
                 p.vx *= speedFactor / p.speedFactor;
@@ -138,8 +138,8 @@
         	cont = false
             const volume = parseFloat(document.getElementById('volume').value);
 
-            // Adjust the size of the box based on the volume
-            boxSize = Math.sqrt(volume) * 30; // Scale volume visually
+           
+            boxSize = Math.sqrt(volume) * 30; 
             const boxContainer = document.getElementById('box-container');
             const container = document.getElementById('gas-container');
             boxContainer.style.width = `${boxSize}px`;
@@ -147,7 +147,7 @@
             container.style.width = `${boxSize}px`;
             container.style.height = `${boxSize}px`;
 
-            updateSimulation(); // Update simulation after volume change
+            updateSimulation(); 
         }
 
         function updateMoles() {
@@ -166,15 +166,14 @@
                 return;
             }
 
-            const numParticles = Math.min(100, Math.floor(moles * 10)); // Scale particle count
-            const speedFactor = Math.sqrt(temperature / 300); // Adjust speed based on temperature
-
+            const numParticles = Math.min(100, Math.floor(moles * 10));
+            const speedFactor = Math.sqrt(temperature / 300); 
             initializeParticles(numParticles, speedFactor);
         }
 
         function initializeParticles(numParticles, speedFactor) {
             const container = document.getElementById('gas-container');
-            container.innerHTML = ''; // Clear previous particles
+            container.innerHTML = ''; 
             particles = [];
 
             for (let i = 0; i < numParticles; i++) {
@@ -200,7 +199,7 @@
                 p.x += p.vx;
                 p.y += p.vy;
 
-                // Check for collisions with the walls
+               
                 if (p.x <= 0 || p.x >= boxSize - 10) p.vx = -p.vx;
                 if (p.y <= 0 || p.y >= boxSize - 10) p.vy = -p.vy;
 
@@ -229,7 +228,7 @@
         }
        
 
-        simulateGas(); // Initial simulation
+        simulateGas(); 
         updateSimulation()
         updateVolume()
         updateMoles()
