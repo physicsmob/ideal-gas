@@ -123,7 +123,7 @@
             document.getElementById('moles-value').textContent = Number(moles).toFixed(1);
 
             const pressure = (moles * R * temperature) / volume; // P = nRT / V
-            document.getElementById('pressure-output').textContent = `Basınç (P): ${pressure.toFixed(2)} atm - PV = ${Number(presuure) * Number(volume)}`;
+            document.getElementById('pressure-output').textContent = `Basınç (P): ${pressure.toFixed(2)} atm - PV = ${Number(pressure) * Number(volume)}`;
 
            
             const speedFactor = Math.sqrt(temperature / 300);
